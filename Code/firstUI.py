@@ -1,12 +1,13 @@
+"""
+This script contains frist attempt at the GUI design.
+It is worth noting that the allocation algorithm isn't the optimal version.
+"""
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import pandas as pd
 import numpy as np
 import os
 
-# ----------------------
-# probability based algo
-# ----------------------
 def calculate_probabilities(tutor_row, course_name, student_faculty):
     
     weights = 0
@@ -68,9 +69,11 @@ def assign_tutors(tutor_df, student_df):
 
     return tutor_allocation, unallocated_students
 
-# ----------------------
-# gui
-# ----------------------
+"""
+This class implements a simple GUI for the system. 
+Allows users to upload CSV files, run the assignment, and download results 
+wihtout code interaction.
+"""
 class AssignmentApp:
     def __init__(self, root):
         self.root = root
@@ -81,14 +84,9 @@ class AssignmentApp:
         self.assignment_result = None
         self.unallocated_students = []
 
-        
         tk.Button(root, text="Upload Tutors CSV", command=self.upload_tutors).pack(pady=10)
         tk.Button(root, text="Upload Students CSV", command=self.upload_students).pack(pady=10)
-
-    
         tk.Button(root, text="Run Assignment", command=self.run_assignment).pack(pady=10)
-
-        
         tk.Button(root, text="Download Results", command=self.download_results).pack(pady=10)
 
     def upload_tutors(self):

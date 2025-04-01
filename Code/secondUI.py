@@ -1,4 +1,6 @@
-
+"""
+This script contains the code whereby the formatting of the output was improved.
+"""
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import pandas as pd
@@ -7,9 +9,6 @@ import os
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill
 
-# ----------------------
-# Probability Assignment Algorithm (Enhanced)
-# ----------------------
 def calculate_probabilities(tutor_row, course_name, student_faculty):
     weights = 0
 
@@ -96,9 +95,10 @@ def rename_duplicates(columns):
         else:
             seen[col] = 0
     return columns
-# ----------------------
-# GUI Interface
-# ----------------------
+
+"""
+This class shwos a slsigth change from original GUI code.
+"""
 class AssignmentApp:
     def __init__(self, root):
         self.root = root
@@ -172,7 +172,7 @@ class AssignmentApp:
                 for student_code, course_name in students:
                     ws_allocated.append(["", student_code, course_name])
 
-            # Add a new sheet for unallocated students
+            # add a new sheet for unallocated students
             ws_unallocated = wb.create_sheet(title="Unallocated Students")
             ws_unallocated.append(["Student Code", "Course Name"])
 
@@ -184,9 +184,7 @@ class AssignmentApp:
             messagebox.showinfo("File Saved", f"Results saved to {save_path}")
 
 
-# ----------------------
-# Running the Application
-# ----------------------
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = AssignmentApp(root)

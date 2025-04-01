@@ -1,16 +1,20 @@
+"""
+This script implemnts a probabilistic method.
+Instead of binary eligibility, it assigns weighted probabilities based on faculty alignment
+and course preferences. Attempts at normalisation of these weights, but still assigns to most
+suited- no randomness.
+Passes unallocated students back in.
+"""
 import pandas as pd
 import numpy as np
-
 
 students = pd.read_csv("Mock CAO round 1 offers.csv", usecols=["Code", "Course Name", "Faculty/School"])
 tutors = pd.read_csv("mock tutor database v2.csv", usecols=["SPR", "Allocate (N)", "allocate to Faculty", "Also", "Preferably", "Then", "But never"])
 
-# initialise
 tutor_allocation = {tutor: [] for tutor in tutors["SPR"]}
 tutor_capacity = {row["SPR"]: row["Allocate (N)"] for _, row in tutors.iterrows()}
 
 def calculate_probabilities(tutor_row, course_name, student_faculty):
-    """Calculate weighted probabilities for a tutor to be assigned a student."""
     weights = []
     courses = tutor_row[["Preferably", "Then"]].dropna().values
     
@@ -24,7 +28,6 @@ def calculate_probabilities(tutor_row, course_name, student_faculty):
         weights.append(0.1)  
     
     return np.mean(weights)  #normalise
-
 
 unallocated_students = []
 
@@ -55,7 +58,7 @@ for _, student in students.iterrows():
     if not assigned:
         unallocated_students.append(student_id)
 
-#second try
+#second try for unallocated students
 for student_id in unallocated_students[:]:
     for tutor_id in tutor_allocation:
         if len(tutor_allocation[tutor_id]) < tutor_capacity[tutor_id]:
@@ -63,10 +66,8 @@ for student_id in unallocated_students[:]:
             unallocated_students.remove(student_id)
             break
 
-
 if unallocated_students:
     print("Students who could not be allocated:", unallocated_students)
-
 
 for tutor_id, allocated_students in tutor_allocation.items():
     print(f"Tutor {tutor_id} is assigned students: {allocated_students}")

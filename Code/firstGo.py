@@ -1,7 +1,11 @@
-
+"""
+This script is an inital high-level approach to the problem.
+Matching strategy focused solely on faculty alignment as this was hinted at as being a 
+considerable factor.
+Data files used were created by synDataGen.py and tutorData.py
+"""
 import pandas as pd
 
-# read in Data
 students = pd.read_csv('studentData.csv')
 tutors = pd.read_csv('tutorData.csv')
 courses = pd.read_csv('courses.csv')
@@ -9,7 +13,6 @@ courses = pd.read_csv('courses.csv')
 courseFaculty = {row['Course Code']: row['Faculty'] for _, row in courses.iterrows()}
 tutorCapacity = {row['Staff Number']: row['Ontake'] for _, row in tutors.iterrows()}
 
-# initialise base for assigning tutors
 tutorStudents = {tutor: [] for tutor in tutorCapacity.keys()}
 
 # looping through students to assign students to tutors

@@ -1,3 +1,10 @@
+"""
+This script coantains the final version of the code.
+This is what was compiled into a functioning executbale for the Senior Tutor's Office.
+True probabilistic approach.
+
+Each function has a brief comment before hand.
+"""
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import pandas as pd
@@ -7,9 +14,10 @@ from openpyxl import Workbook
 from openpyxl.styles import PatternFill
 from PIL import Image, ImageTk  
 
-# ----------------------
-# Probability Assignment Algorithm
-# ----------------------
+"""
+This function weights the tutors according to preferences.
+Input parameters: data extracted from tutor & student files.
+"""
 def calculate_probabilities(tutor_row, course_name, student_faculty):
     weights = 0
 
@@ -41,6 +49,13 @@ def calculate_probabilities(tutor_row, course_name, student_faculty):
 
     return weights 
 
+"""
+This function is the allocation algorithm.
+Calls fucntion to calculate probability weightings. Normalises these to create distribution.
+Random selection of tutor based on this. 
+Porgress bar updates on each iteration->further comments. 
+Input paraemters: student dataframe, tutor dataframe, progress tracker for progress bar.
+"""
 def assign_tutors(tutor_df, student_df, update_progress=None):
     tutor_allocation = {tutor: [] for tutor in tutor_df["SPR"]}
     tutor_capacity = {row["SPR"]: row["Allocate (N)"] for _, row in tutor_df.iterrows()}
@@ -92,13 +107,16 @@ def assign_tutors(tutor_df, student_df, update_progress=None):
         if not assigned:
             unallocated_students.append(student["Code"])
     
-    # complete
+    # complete progress bar
     if update_progress is not None:
         update_progress(100)
 
     return tutor_allocation, unallocated_students
 
-
+"""
+This fucntion was written to rename duplicate columns on data extraction from files as there 
+were multiple "Then" and "But never" columns.
+"""
 def rename_duplicates(columns):
     seen = {}
     for i, col in enumerate(columns):
@@ -109,9 +127,9 @@ def rename_duplicates(columns):
             seen[col] = 0
     return columns
 
-# ----------------------
-# GUI 
-# ----------------------
+"""
+Class initiated for the pop-up/interface.
+"""
 class AssignmentApp:
     def __init__(self, root):
         self.root = root

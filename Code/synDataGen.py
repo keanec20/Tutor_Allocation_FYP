@@ -1,3 +1,9 @@
+"""
+This script was used to generate synthetic student data to use in early-satge algorithm 
+development. Course codes were copied and pasted from CourseHero.ie
+The code then generates random student 8-digit numbers between 10000000 and 99999999. 
+50 students were generated for each course code in the university.
+"""
 import random
 import csv
 

@@ -1,3 +1,9 @@
+"""
+Tailored so that a comprehensive data set filled with tutors from the three distinct 
+faculty areas within the university is created.
+It randomly assigns staff numbers between 1000 and 9999 so each tutor can be individually identified. 
+The algorithm also allocates a chamber size (allocation capacity) of 40,80, or 120 to each tutor.
+"""
 import random
 import csv
 
