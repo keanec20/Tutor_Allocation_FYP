@@ -4,7 +4,7 @@ import pandas as pd
 students = pd.read_csv("studentData.csv")  # Student Data
 tutors = pd.read_csv("tutorData.csv")      # Tutor Data
 
-# Initialize Allocation
+# Initialise Allocation
 tutor_allocation = {tutor: [] for tutor in tutors["SPR"]}
 tutor_capacity = {row["SPR"]: row["Allocate (N)"] for _, row in tutors.iterrows()}
 

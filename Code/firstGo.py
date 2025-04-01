@@ -12,12 +12,12 @@ tutorCapacity = {row['Staff Number']: row['Ontake'] for _, row in tutors.iterrow
 # initialise base for assigning tutors
 tutorStudents = {tutor: [] for tutor in tutorCapacity.keys()}
 
-# assign students to tutors
+# looping through students to assign students to tutors
 for _, student in students.iterrows():
     studentNumber = student['Student Number']
     studentCourse = student['Course Code']
     
-    # match stduent to faculty
+    # match student to faculty
     student_faculty = courseFaculty.get(studentCourse)
     # match tutor to faculty
     available_tutors = [
