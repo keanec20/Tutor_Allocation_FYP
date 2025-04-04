@@ -45,11 +45,11 @@ def assign_tutors(tutor_df, student_df):
             continue
 
         total_weight = eligible_tutors["Probability"].sum()
-        eligible_tutors["Normalized Probability"] = eligible_tutors["Probability"] / total_weight
+        eligible_tutors["Normalised Probability"] = eligible_tutors["Probability"] / total_weight
 
         assigned = False
         tutor_choices = eligible_tutors["SPR"].tolist()
-        tutor_probabilities = eligible_tutors["Normalized Probability"].tolist()
+        tutor_probabilities = eligible_tutors["Normalised Probability"].tolist()
 
         while tutor_choices:
             chosen_tutor = np.random.choice(tutor_choices, p=tutor_probabilities)
