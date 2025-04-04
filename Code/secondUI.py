@@ -97,7 +97,7 @@ def rename_duplicates(columns):
     return columns
 
 """
-This class shwos a slsigth change from original GUI code.
+This class shows a slight change from original GUI code.
 """
 class AssignmentApp:
     def __init__(self, root):
