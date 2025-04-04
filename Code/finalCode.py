@@ -85,11 +85,11 @@ def assign_tutors(tutor_df, student_df, update_progress=None):
 
         total_weight = eligible_tutors["Probability"].sum()
        
-        eligible_tutors["Normalized Probability"] = eligible_tutors["Probability"] / total_weight
+        eligible_tutors["Normalised Probability"] = eligible_tutors["Probability"] / total_weight
 
         assigned = False
         tutor_choices = eligible_tutors["SPR"].tolist()
-        tutor_probabilities = eligible_tutors["Normalized Probability"].tolist()
+        tutor_probabilities = eligible_tutors["Normalised Probability"].tolist()
 
         while tutor_choices:
             chosen_tutor = np.random.choice(tutor_choices, p=tutor_probabilities)
@@ -114,7 +114,7 @@ def assign_tutors(tutor_df, student_df, update_progress=None):
     return tutor_allocation, unallocated_students
 
 """
-This fucntion was written to rename duplicate columns on data extraction from files as there 
+This function was written to rename duplicate columns on data extraction from files as there 
 were multiple "Then" and "But never" columns.
 """
 def rename_duplicates(columns):
@@ -131,6 +131,9 @@ def rename_duplicates(columns):
 Class initiated for the pop-up/interface.
 """
 class AssignmentApp:
+    """
+    This function designs the interface using Tkinter library.
+    """
     def __init__(self, root):
         self.root = root
         self.root.title("Tutor-Student Assignment")
@@ -144,15 +147,12 @@ class AssignmentApp:
         self.tutor_df = None
         self.student_df = None
 
-        
         self.main_frame = tk.Frame(root, padx=10, pady=10)
         self.main_frame.pack(fill=tk.BOTH, expand=True)
         
-       
         self.logo_frame = tk.Frame(self.main_frame, height=80, width=400)
         self.logo_frame.pack(pady=5)
         
-        # logo
         self.logo_label = tk.Label(
             self.logo_frame, 
             text="TUTOR ALLOCATION SYSTEM", 
@@ -161,13 +161,6 @@ class AssignmentApp:
         )
         self.logo_label.pack(pady=10)
         
-        try:
-            logo_img = Image.open("tcdlogo.jpg")
-            logo_img = logo_img.resize((100, 100), Image.LANCZOS)
-            self.logo_photo = ImageTk.PhotoImage(logo_img)
-            self.logo_label.config(image=self.logo_photo, text="")
-        except:
-            pass  #  back to text if image loading fails
         
         # file upload
         self.file_frame = tk.LabelFrame(self.main_frame, text="Input Files", padx=10, pady=10)
@@ -207,7 +200,7 @@ class AssignmentApp:
         self.button_frame = tk.Frame(self.main_frame)
         self.button_frame.pack(fill=tk.X, pady=10)
         
-        #run
+        #run on click
         self.run_btn = tk.Button(
             self.button_frame, 
             text="Allocate Tutors", 
@@ -219,7 +212,7 @@ class AssignmentApp:
         )
         self.run_btn.pack(side=tk.LEFT, padx=10)
         
-        #downlaod
+        #downlaod on click
         self.download_btn = tk.Button(
             self.button_frame, 
             text="Download Results", 
@@ -230,53 +223,26 @@ class AssignmentApp:
         )
         self.download_btn.pack(side=tk.LEFT, padx=10)
         
-        # results prev display box
-        #self.results_frame = tk.LabelFrame(self.main_frame, text="Assignment Results", padx=10, pady=10)
-        #self.results_frame.pack(fill=tk.BOTH, expand=True, pady=5)
-        
-        #self.results_text = tk.Text(self.results_frame, height=10, width=50)
-        #self.results_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        
-       
-
+    """
+    This functgion updates the progress bar during algorithm iterations.
+    Input parameters: current progress value.
+    """
     def update_progress(self, value):
-        """Update progress bar and refresh UI"""
         self.progress_var.set(value)
         self.root.update_idletasks()
 
-    
+    """
+    This function handles potential errors in uploaded data file content.
+    Checks for required columns, duplicates, adn missing values.
+    Stops user from running algorithm if file doesn't pass checks.
+    """
     def validate_data(self):
-        """Validate all input data before running assignment algorithm"""
+        #makes sure two files uploaded
         if self.tutor_df is None or self.student_df is None:
             messagebox.showwarning("Input Missing", "Please upload both tutor and student CSV files.")
             return False
         
-        # Check for empty files
-        if len(self.tutor_df) == 0:
-            messagebox.showerror("Invalid Data", "Tutor file is empty. Please upload a valid file.")
-            return False
-        
-        if len(self.student_df) == 0:
-            messagebox.showerror("Invalid Data", "Student file is empty. Please upload a valid file.")
-            return False
-        
-        # Check for required columns in tutor file
-        required_tutor_columns = ["SPR", "NAME", "Allocate (N)", "allocate to Faculty"]
-        missing_tutor_columns = [col for col in required_tutor_columns if col not in self.tutor_df.columns]
-        if missing_tutor_columns:
-            messagebox.showerror("Invalid Tutor File", 
-                                f"Missing required columns in tutor file: {', '.join(missing_tutor_columns)}")
-            return False
-        
-        # Check for required columns in student file
-        required_student_columns = ["Code", "Course Name", "Faculty/School"]
-        missing_student_columns = [col for col in required_student_columns if col not in self.student_df.columns]
-        if missing_student_columns:
-            messagebox.showerror("Invalid Student File", 
-                                f"Missing required columns in student file: {', '.join(missing_student_columns)}")
-            return False
-        
-        # Check for duplicate tutors
+        # checks for duplicate tutors based on SPR
         duplicate_tutors = self.tutor_df["SPR"].duplicated()
         if duplicate_tutors.any():
             dup_tutor_ids = self.tutor_df.loc[duplicate_tutors, "SPR"].tolist()
@@ -285,11 +251,11 @@ class AssignmentApp:
                                         f"Only the first occurrence of each will be used. Continue?")
             if not result:
                 return False
-            # Remove duplicates, keeping first occurrence
+            # removes duplicates, keeping first appearance of SPR
             self.tutor_df = self.tutor_df.drop_duplicates(subset=["SPR"], keep="first")
             self.status_var.set(f"Removed {len(dup_tutor_ids)} duplicate tutor records")
         
-        # Check for duplicate students
+        # checks for duplicate students
         duplicate_students = self.student_df["Code"].duplicated()
         if duplicate_students.any():
             dup_student_ids = self.student_df.loc[duplicate_students, "Code"].tolist()
@@ -298,11 +264,13 @@ class AssignmentApp:
                                         f"Only the first occurrence of each will be used. Continue?")
             if not result:
                 return False
-            # Remove duplicates, keeping first occurrence
+            # removes duplicates, keeping first appearance of student Code
             self.student_df = self.student_df.drop_duplicates(subset=["Code"], keep="first")
             self.status_var.set(f"Removed {len(dup_student_ids)} duplicate student records")
         
-        # Check for empty values in required fields
+        # checks for empty values in required fields-- uses lists created earlier for required columns
+        required_student_columns = ["Code", "Course Name", "Faculty/School"]
+        required_tutor_columns = ["SPR", "NAME", "Allocate (N)"]
         missing_tutor_data = self.tutor_df[required_tutor_columns].isnull().any(axis=1)
         if missing_tutor_data.any():
             tutor_count = missing_tutor_data.sum()
@@ -322,10 +290,14 @@ class AssignmentApp:
                                         f"These students won't be allocated. Continue?")
             if not result:
                 return False
-            # Don't remove these - they'll just be added to unallocated students
+            # user asked if they want to remove tutors, whereas studnets just marked as unnallocated
         
         return True
 
+    """
+    This function handles the tutor file on upload.
+    Carries out inital checks of file format, making sure file has correct columns and isn't empty.
+    """
     def upload_tutors(self):
         self.tutor_file = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
         if self.tutor_file:
@@ -333,7 +305,7 @@ class AssignmentApp:
             try:
                 self.tutor_df = pd.read_csv(self.tutor_file)
                 
-                # Basic file check
+                # empty file check
                 if self.tutor_df.empty:
                     messagebox.showerror("Error", "The tutor file is empty.")
                     self.tutor_path_var.set("")
@@ -342,7 +314,7 @@ class AssignmentApp:
                     
                 self.tutor_df.columns = rename_duplicates(self.tutor_df.columns)
                 
-                # Check for required columns
+                # required columns check
                 required_columns = ["SPR", "NAME", "Allocate (N)"]
                 missing_columns = [col for col in required_columns if col not in self.tutor_df.columns]
                 
@@ -360,6 +332,10 @@ class AssignmentApp:
                 self.tutor_path_var.set("")
                 self.tutor_df = None
 
+    """
+    This function handles the students file on upload.
+    Carries out inital checks of file format, making sure file has correct columns and isn't empty.
+    """
     def upload_students(self):
         self.student_file = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
         if self.student_file:
@@ -367,14 +343,14 @@ class AssignmentApp:
             try:
                 self.student_df = pd.read_csv(self.student_file)
                 
-                # Basic file check
+                # empty file check
                 if self.student_df.empty:
                     messagebox.showerror("Error", "The student file is empty.")
                     self.student_path_var.set("")
                     self.student_df = None
                     return
                     
-                # Check for required columns
+                # required columns check
                 required_columns = ["Code", "Course Name", "Faculty/School"]
                 missing_columns = [col for col in required_columns if col not in self.student_df.columns]
                 
@@ -392,8 +368,11 @@ class AssignmentApp:
                 self.student_path_var.set("")
                 self.student_df = None
 
+    """
+    This fucntion executes allocation using uploaded files.
+    Calls the other fucntions to update progress bar, handle errors, and allows for download of results.
+    """
     def run_assignment(self):
-        # Validate data before running the assignment
         if not self.validate_data():
             return
 
@@ -402,25 +381,22 @@ class AssignmentApp:
         self.root.update()
         
         try:
-            # Run allocation
             self.assignment_result, self.unallocated_students = assign_tutors(
                 self.tutor_df, 
                 self.student_df,
                 self.update_progress
             )
             
-            # Add any students with missing data to unallocated list
+            # deals with students with missing data, assigns them to unallocated list
             required_student_columns = ["Code", "Course Name", "Faculty/School"]
             missing_data_mask = self.student_df[required_student_columns].isnull().any(axis=1)
             missing_data_students = self.student_df.loc[missing_data_mask, "Code"].tolist()
             self.unallocated_students.extend([s for s in missing_data_students if s not in self.unallocated_students])
-            
+        
             self.status_var.set("Assignment completed")
             
-            # Enable download button
+            # download button becomes live
             self.download_btn.config(state=tk.NORMAL)
-            
-            self.update_results_display()
             
             if self.unallocated_students:
                 messagebox.showinfo("Assignment Completed", 
@@ -432,35 +408,9 @@ class AssignmentApp:
             messagebox.showerror("Error", f"An error occurred during assignment: {str(e)}")
             self.status_var.set("Allocation failed")
 
-    def update_results_display(self):
-        
-        #self.results_text.config(state=tk.NORMAL)
-        #self.results_text.delete(1.0, tk.END)
-        
-        total_students = len(self.student_df)
-        allocated_students = total_students - len(self.unallocated_students)
-        allocation_rate = (allocated_students / total_students) * 100 if total_students > 0 else 0
-        
-        summary = f"Allocation Summary\n"
-        summary += f"=================\n\n"
-        summary += f"Total tutors: {len(self.tutor_df)}\n"
-        summary += f"Total students: {total_students}\n"
-        summary += f"Allocated students: {allocated_students}\n"
-        summary += f"Unallocated students: {len(self.unallocated_students)}\n"
-        summary += f"Allocation rate: {allocation_rate:.2f}%\n\n"
-        
-        if self.unallocated_students:
-            summary += f"Unallocated Student Codes:\n"
-            summary += f"-----------------------\n"
-            for code in self.unallocated_students[:10]:  #first 10
-                summary += f"- {code}\n"
-            
-            if len(self.unallocated_students) > 10:
-                summary += f"... and {len(self.unallocated_students) - 10} more\n\n"
-        
-        #self.results_text.insert(tk.END, summary)
-        #self.results_text.config(state=tk.DISABLED)
-
+    """
+    This function creates an Excel workbook with two seperate sheets for allocated and unallocated students.
+    """
     def download_results(self):
             if not self.assignment_result:
                 messagebox.showwarning("No Data", "No results to download. Run the assignment first.")
@@ -469,6 +419,7 @@ class AssignmentApp:
             save_path = filedialog.asksaveasfilename(defaultextension=".xlsx",
                                                     filetypes=[("Excel files", "*.xlsx")])
             if save_path:
+                #update UI status
                 self.status_var.set("Generating Excel report...")
                 self.root.update()
                 
@@ -516,9 +467,9 @@ class AssignmentApp:
                     self.status_var.set("File save failed")
 
 
-# ----------------------
-# run app
-# ----------------------
+"""
+RUN THE APP
+"""
 if __name__ == "__main__":
     root = tk.Tk()
     app = AssignmentApp(root)
